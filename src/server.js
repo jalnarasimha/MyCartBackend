@@ -43,19 +43,13 @@ async function connectDB() {
     console.log('Starting in-memory MongoDB fallback');
     const mongod = await MongoMemoryServer.create();
     uri = mongod.getUri();
-    await mongoose.connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(uri);
     console.log('Connected to in-memory MongoDB');
   }
 
   if (uri) {
     try {
-      await mongoose.connect(uri, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      });
+      await mongoose.connect(uri);
       console.log('Connected to MongoDB');
       return;
     } catch (err) {

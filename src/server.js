@@ -6,6 +6,11 @@ const userRoutes = require('./routes/userRoutes');
 
 dotenv.config();
 
+if (!process.env.JWT_SECRET) {
+  console.error('FATAL ERROR: JWT_SECRET is not defined in your environment variables. Please add it to a .env file.');
+  process.exit(1);
+}
+
 const app = express();
 app.use(express.json());
 app.use(cors());

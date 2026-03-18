@@ -16,7 +16,8 @@ Sample Shopping Cart Project
   "username": "exampleUser",
   "phoneNumber": "1234567890",
   "password": "securePassword123",
-  "status": "active"
+  "status": "active",
+  "userRole": "user"
 }
 ```
 

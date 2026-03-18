@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 exports.createUser = async (req, res) => {
   try {
-    const { username, phoneNumber, password, status } = req.body;
+    const { username, phoneNumber, password, status, userRole } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ $or: [{ username }, { phoneNumber }] });
@@ -20,7 +20,8 @@ exports.createUser = async (req, res) => {
       username,
       phoneNumber,
       password: hashedPassword,
-      status: status || 'active'
+      status: status || 'active',
+      userRole: userRole || 'user'
     });
 
     await newUser.save();
@@ -30,7 +31,8 @@ exports.createUser = async (req, res) => {
       user: {
         id: newUser._id,
         username: newUser.username,
-        status: newUser.status
+        status: newUser.status,
+        userRole: newUser.userRole
       }
     });
   } catch (error) {

@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
+const productRoutes = require('./routes/productRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 
 dotenv.config();
@@ -39,6 +40,7 @@ app.post('/api/hello', (req, res) => {
 // routes
 app.use('/api/users', userRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/products', productRoutes);
 
 // connect to MongoDB (with in-memory fallback)
 const { MongoMemoryServer } = require('mongodb-memory-server');

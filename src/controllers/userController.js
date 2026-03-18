@@ -40,12 +40,14 @@ exports.createUser = async (req, res) => {
   }
 };
 
-exports.loginUser = async (req, res) => {
+const handleLogin = async (req, res, allowedRoles) => {
   try {
     const { username, phoneNumber, password } = req.body;
 
     if ((!username && !phoneNumber) || !password) {
-      return res.status(400).json({ message: 'Please provide username or phoneNumber, and password.' });
+      return res
+        .status(400)
+        .json({ message: 'Please provide username or phoneNumber, and password.' });
     }
 
     // Find user by username or phone number
@@ -57,39 +59,68 @@ exports.loginUser = async (req, res) => {
     }
 
     if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    // Role check: admin can use any login, others must match the role for the endpoint.
+    if (user.userRole !== 'admin' && !allowedRoles.includes(user.userRole)) {
+      return res.status(403).json({
+        message: `Access denied. Only ${allowedRoles.join(
+          ' or '
+        )} roles can login here.`,
+      });
     }
 
     // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     // Check if user is active
     if (user.status !== 'active') {
-      return res.status(403).json({ message: `User account is ${user.status}.` });
+      return res
+        .status(403)
+        .json({ message: `User account is ${user.status}.` });
     }
 
     // Create JWT Payload
     const payload = {
       user: {
         id: user.id,
+        role: user.userRole,
       },
     };
 
     // Sign token
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: '1h', // Token expires in 1 hour
+      expiresIn: '5h', // Token expires in 5 hours
     });
 
     res.json({
       message: 'Login successful',
       token,
+      user: {
+        id: user.id,
+        username: user.username,
+        userRole: user.userRole,
+      },
     });
   } catch (error) {
     res.status(500).json({ message: 'Server Error', error: error.message });
   }
+};
+
+exports.loginUser = async (req, res) => {
+  await handleLogin(req, res, ['user']);
+};
+
+exports.loginStore = async (req, res) => {
+  await handleLogin(req, res, ['store']);
+};
+
+exports.loginAdmin = async (req, res) => {
+  await handleLogin(req, res, ['admin']);
 };
 
 exports.getAllUsers = async (req, res) => {

@@ -5,6 +5,8 @@ const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
 const productRoutes = require('./routes/productRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
+const storeRoutes = require('./routes/storeRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 dotenv.config();
 
@@ -41,6 +43,8 @@ app.post('/api/hello', (req, res) => {
 app.use('/api/users', userRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/stores', storeRoutes);
+app.use('/api/admin', adminRoutes);
 
 // connect to MongoDB (with in-memory fallback)
 const { MongoMemoryServer } = require('mongodb-memory-server');
